@@ -1,0 +1,1485 @@
+% Manuscript-to-copyeditor.tex - to send to copy editor, taking out the Supp
+% Material and various un-needed commented text. 6th January 2020.
+
+% Manuscript.tex - revisions for MEPS. Starting 8th November 2019.
+% ssmPart2meps.tex - for submission to MEPS. 18th June 2019.
+
+%%%  FOR TYPESETTERS
+%%%  This is my latex file for the manuscript, including references and tables,
+%%%  and exluding the Supplementary Material.
+%%%  A lot of the commands at the start are just
+%%%  settings and preamble, so scroll down to \begin{document} for the start of
+%%%  the text. Comments start with %, and I took off the line numbers.  Please
+%%%  contact me with any queries, especially if you are going to run Latex
+%%%  rather than just use the text from this file, though I expect you may just
+%%%  copy the text into another editor and proceed from there).
+%%%   Andrew.Edwards@dfo-mpo.gc.ca
+%%%
+%%%  To make the .pdf file, I run:
+%%%  pdflatex Manuscript-to-copyeditor  (maybe twice the first time to get the references working)
+
+\documentclass[12pt, letter]{article}
+\textheight 213mm
+\topmargin -10mm
+\addtolength{\textwidth}{1.0in}
+\addtolength{\oddsidemargin}{-0.5in}
+\usepackage{epsfig}
+\usepackage{rotating}           % For sideways table
+\usepackage[pagewise]{lineno}
+\usepackage{amsmath}       % for \text for x_min, for \dfrac
+\usepackage{cancel}        % for \cancel
+\usepackage{natbib}
+\usepackage{array}         % for fixed with tables
+\usepackage[table]{xcolor} % apparently best to load last. For Appendix tables.
+\usepackage{forloop}
+
+\usepackage{mathptmx}      % Bolder Times plus has math fonts (as for hake)
+
+% \usepackage{minitoc}       % See
+      % https://tex.stackexchange.com/questions/419249/table-of-contents-only-for-the-appendix
+% Make the "Part I" text invisible [ignore main text in TOC]
+\renewcommand \thepart{}
+\renewcommand \partname{}
+
+% \usepackage{tocloft}       % For ToC
+% \addtolength{\cftsubsecnumwidth}{6pt} % For spacing after section numbers in
+                                    %  Supp Info TOC.
+% \makeatletter \renewcommand{\@dotsep}{4.5} \makeatother % for dots, didn't work.
+
+\bibliographystyle{natbib}
+
+
+% \linenumbers
+
+
+% \pagestyle{headings}
+\newcommand{\eb}{\begin{eqnarray}}
+\newcommand{\ee}{\end{eqnarray}}
+\newcommand{\xmin}{x_{\mathrm{min}}}
+\newcommand{\xmax}{x_{\mathrm{max}}}
+\newcommand{\logten}{\log_{\mathrm{10}}}
+\newcommand{\logtwo}{\log_{\mathrm{2}}}
+\newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}p{#1}}    % From http://tex.stackexchange.com/questions/12703/how-to-create-fixed-width-table-columns-with-text-raggedright-centered-raggedlef   for fixed with columns     though I changed m{#1} to p{#1}
+
+\newcommand{\dx}{\mbox{d}x}
+% \newcommand{\standHist}{\ref{fig:dataCode/standHist}}
+% \newcommand{\fit}{\ref{fig:dataCode/fitting2a}}
+\newcommand{\fitMLEhists}{\ref{fig:binFitting/fitMLEhists}}
+\newcommand{\fitMLEconfs}{\ref{fig:binFitting/fitMLEconfs}}
+\newcommand{\fitMLEhistsXminSixteen}{\ref{fig:binFitting/xmin16/fitMLEhistsXmin16}}
+\newcommand{\fitMLEconfsXminSixteen}{\ref{fig:binFitting/xmin16/fitMLEconfsXmin16}}
+\newcommand{\fitMLEhistsCutOffSixteen}{\ref{fig:binFitting/xCutOff16/fitMLEhistsCutOff16}}
+\newcommand{\fitMLEconfsCutOffSixteen}{\ref{fig:binFitting/xCutOff16/fitMLEconfsCutOff16}}
+\newcommand{\MEE}{erpbb17}     % bib citation for Edwards et al. (2017) MEE paper
+\newcommand{\wordcount}{\input{\jobname.wc}}  % To automate wordcount
+\newcommand{\epssize}{\epsfxsize=6in}  % To fool latexdiff when adding new
+                                % figure (trends100.eps)
+
+% \def\fracd#2{\frac{\displaystyle #1}{\displaystyle #2}}
+
+% Had this for Ecology, probably tweak for JAE:
+% \bibpunct{(}{)}{,}{a}{}{,}   % see natbib.pdf, p13
+
+\newcommand\onefig[3]{    % label (old filename and dir) is #1, text is #2,
+                          % filename is now #3 (figure1.eps etc for
+                          % copyeditor version)
+  \begin{figure}[tp]
+  \begin{center}
+   % \includegraphics[width=6in,height=7in,keepaspectratio=TRUE]{#1.eps} \\  % RH much better control
+  \epsfxsize=6in
+  \epsfbox{#3.eps}
+  \end{center}
+  \caption{#2 }
+  \label{fig:#1}
+  \end{figure}
+  % \clearpage
+}
+
+\newcommand\onefigshift[3]{    % label (old filename and dir) is #1, text is #2,
+                               % filename is #3, as above
+  \begin{figure}[tp]
+  \begin{center}
+   % \includegraphics[width=6in,height=7in,keepaspectratio=TRUE]{#1.eps} \\  % RH much better control
+  \epsfxsize=6in
+  \epsfbox{#3.eps}
+  \end{center}
+  \vspace{-10mm}
+  \caption{#2}
+  \label{fig:#1}
+  \end{figure}
+  % \clearpage
+}
+
+\newcommand\isdfig[2]{    % filename is #1, text is #2
+  \begin{figure}[tp]
+  \begin{center}
+  \vspace{-5mm}
+   % \includegraphics[width=6in,height=7in,keepaspectratio=TRUE]{#1.eps} \\  % RH much better control
+  % \epsfxsize=6.5in
+  \epsfbox{../../fitting-size-spectra/codeBinStructure/nSeaFung/IBTS-ISDfigs/IBTS-ISD#1.eps}
+  \end{center}
+  \vspace{-5mm}
+  \caption{#2}
+  \label{fig:ISD-#1}
+  \end{figure}
+  \clearpage
+}
+
+
+\newcommand\simpfig[2]{    % filename is #1, text is #2. No epsfxsize
+  \begin{figure}[tp]
+  \begin{center}
+   % \includegraphics[width=6in,height=7in,keepaspectratio=TRUE]{#1.eps} \\  % RH much better control
+  % \epsfxsize=6in
+  \epsfbox{#1.eps}
+  \end{center}
+  \caption{#2 }
+  \label{fig:#1}
+  \end{figure}
+  \clearpage
+}
+
+
+\newcommand\twofig[4]{   % figure #1 under #2, caption text #3, width #4
+  \begin{figure}[tp]     %  label will be #1
+  \centering
+  \epsfxsize=#4 in
+%  \epsfysize=3.5in
+  \begin{tabular}{c}
+  %	\includegraphics[width=6in,height=3.5in,keepaspectratio=TRUE]{#1.eps} \\  % RH much better control
+  %	\includegraphics[width=6in,height=3.5in,keepaspectratio=TRUE]{#2.eps}
+  \epsfbox{#1.eps}
+  \vspace{-15mm}\\
+  \epsfbox{#2.eps}
+  \end{tabular}
+  \caption{#3}
+  \label{fig:#1}
+  \end{figure}
+  \clearpage
+}
+
+\newcommand\threefig[4]{    % figure #1 then #2 then #3,
+  \begin{figure}[htp]       %  caption text #4, label will be #1
+  \centering
+  \begin{tabular}{c}
+%	\includegraphics[width=6in,height=2.5in,keepaspectratio=TRUE]{#1.eps} \\  % RH much better control
+%	\includegraphics[width=6in,height=2.5in,keepaspectratio=TRUE]{#2.eps} \\
+%	\includegraphics[width=6in,height=2.5in,keepaspectratio=TRUE]{#3.eps}
+  \vspace{-20mm}
+  \epsfbox{#1.eps} \\
+  \vspace{-20mm}
+  \epsfbox{#2.eps} \\
+   \vspace{-20mm}
+  \epsfbox{#3.eps}
+  \end{tabular}
+  \caption{#4}
+  \label{fig:#1}
+  \end{figure}
+}
+
+
+\renewcommand{\baselinestretch}{1.6}
+\renewcommand{\refname}{Literature Cited}
+%TC:macroword \onefig 1
+%TC:macroword \onefigshift 3
+%TC:macroword \simpfig 3
+%TC:macroword \simpfigshift 3
+%TC:macroword \twofig 3
+
+
+
+\begin{document}
+
+%TC:ignore
+
+\noindent {\Large \bf Accounting for the bin structure of data removes
+  bias when fitting size spectra}
+
+\vspace{7mm}
+
+\noindent {\large Andrew M.~Edwards$^{1,2,\star}$, James P. W. Robinson$^{2,3}$, Julia
+  L. Blanchard$^{4}$, \\Julia K. Baum$^{2}$ and Michael J. Plank$^{5,6}$}
+
+\medskip
+
+{\it
+\noindent $^1$Pacific Biological Station, Fisheries and Oceans Canada,
+  Nanaimo, British Columbia, V9T 6N7, Canada. %  3190 Hammond Bay Road,
+\noindent $^2$Department
+  of Biology, University of Victoria, Victoria, British
+  Columbia, V8W 2Y2, Canada. % PO Box 1700 STN CSC,
+\noindent $^3$Lancaster Environment Centre, Lancaster University, Lancaster,
+  LA1 4YW, U.K.
+\noindent $^4$Institute for Marine and Antarctic Studies,
+  University of Tasmania, Hobart, TAS 7001, Australia. % Private Bag 129,
+\noindent $^5$School of Mathematics and Statistics, University of Canterbury,
+  Christchurch, New Zealand.
+\noindent $^6$Te P\={u}naha Matatini, a New Zealand Centre of
+  Research Excellence, University of Auckland, Auckland 1011, New Zealand.}
+
+\medskip
+
+\noindent $^\star$Corresponding author email: Andrew.Edwards@dfo-mpo.gc.ca
+
+
+\medskip
+
+\medskip
+
+\noindent Running page header: Size spectra for binned data % 3-6 words
+
+\medskip
+
+\section*{Abstract}
+
+Size spectra are recommended tools for detecting the
+response of marine communities to fishing or to management measures.
+A size spectrum succinctly describes how a
+property, such as abundance or biomass, varies with body size in a
+community.
+Required
+data are often collected in binned form, such as numbers of individuals
+in 1-cm length bins.
+Numerous methods have been employed to fit size spectra, but most give
+biased estimates when tested on simulated data, and none account for
+the data's bin structure (breakpoints of bins).
+Here we use eight methods to fit an annual size-spectrum
+exponent, $b$, to an example data set (30~years of the North Sea
+International Bottom Trawl Survey).
+The methods give conflicting conclusions regarding $b$ declining
+(the size spectrum steepening) through time, and so any resulting advice
+to ecosystem managers will be highly dependent upon the method used.
+Using simulated data we show that ignoring the bin structure gives biased
+estimates of $b$,
+even for high-resolution data. However, our extended likelihood method, that
+explicitly accounts for the bin structure, accurately estimates $b$ and its
+confidence intervals, even for coarsely collected data.
+We develop a novel visualisation method that accounts for the bin
+structure and associated uncertainty, give
+recommendations concerning different data types, and
+create an R package ({\tt sizeSpectra}) to reproduce all results and encourage use of our methods.
+This work is also relevant to wider applications where
+a power-law distribution (the underlying distribution for a size spectrum) is
+fitted to binned data.
+
+\vspace{10mm}
+% 3-8 key words, in order
+\noindent {\it Key words:} abundance size spectrum, biomass size spectrum,
+individual size distribution, ecosystem-based fisheries management,
+ecosystem indicators, truncated Pareto distribution, power-law distribution
+
+% MEE says maximum of 6000-7000 words
+\medskip
+\noindent Word count (including references, tables and figure legends): 7953 % \wordcount
+% this is to automate the word count
+
+% Obtain with:
+% texcount -1 -sum -relaxed Manuscript-to-copyeditor.tex > Manuscript-to-copyeditor.wc
+% texcount -sum -html Manuscript.tex > Manuscript.html  - looks like it's
+%  ignoring bibliography, tried some fixes (even latex to get .bbl, and having
+%  .bbl in the file now), but didn't work. Manually counted the difference from
+%  submitted version and updated .wc file to 7953.
+
+\medskip
+
+\noindent Revised version to \emph{Marine Ecology Progress Series}
+
+\noindent \today
+
+%TC:endignore
+
+\clearpage
+
+\section{Introduction}
+
+Ecosystem-based fisheries management requires general indicators to accurately
+assess ecosystem states across space and time \citep{jenn05, srjfg05}.
+Size spectra quantify how a property (such as abundance or biomass) varies with
+body size in a community \citep{rg96}, leading to a variety of applications.
+They are readily fitted to simple body-size data, and have
+therefore been widely applied to aquatic ecosystems
+(e.g.~\citealt{dpmg04, dgpr05, bblhw12}).
+A new application involves using size-spectra models and simulated carbon fluxes
+from an ocean-biogeochemistry model to estimate how global benthic communities
+may respond to climate change and ocean acidification \citep{kellyg14, ymabjr17}.
+And size
+spectra are considered candidate ``ecosystem Essential Ocean
+Variables'' for monitoring changes of phytoplankton, zooplankton, benthic
+invertebrates, krill and fish in the Southern Ocean \citep{consta16}.
+
+
+The slope of the size spectrum is a
+recommended ecosystem indicator because of its apparent responsiveness to
+fishing impacts.
+\citet{pj05} tested the response to fishing of eight potential fish community
+indicators and found that only the slope of the biomass size spectrum reliably
+detected the
+effects of spatial management measures (partial closure of an area of
+the North Sea). \citet{jd05} similarly recommended the use of size spectra to
+provide
+surveillance of the status of fish communities. They pointed out difficulties in
+justifying reference points (targets to be aimed for and limits to be avoided),
+and instead recommended reference directions that monitor trends in
+size-spectrum slopes through time. Such trends are commonly investigated in
+size-spectrum studies (e.g.~\citealt{blan05, bblhw12}).
+Using 188 plausible multispecies size-structured fish community
+models, \citet{tllcj15} found that the slope of the abundance size spectrum was
+the most responsive indicator of the four indicators tested.
+Size-spectra parameters
+have been selected by the European Union as one of several indicators used to
+evaluate sea-floor integrity \citep{europe10, rice12}, and size-spectrum models
+continue to be widely applied
+(e.g.~\citealt{tfp14, amln16, ssmarp16, wsj18, zcxxr18, mnwb18, va18, zhou19}).
+Such applications require
+consistent calculation methods, especially when used for providing practical
+advice to fisheries (or ecosystem) managers.
+However,
+most commonly employed methods for fitting
+size-spectra have been shown to give biased estimates and inaccurate confidence
+intervals for simulated data
+\citep{\MEE}, underscoring the need for close evaluation of methods.
+
+
+Data used in size-spectra studies are often only collected in binned form,
+whereby the
+`bin structure' (breakpoints of the bins, \citealt{monn16}) is determined during
+data collection. For example, \citet{dgpr05} analysed fish lengths collected in
+bins of width 0.5~cm, 1~cm and 5~cm. For benthic invertebrates in the
+North Sea,
+\citet{mj06} sorted individuals into sixteen $\logtwo$ body-mass bins, resulting
+in counts and total biomass for each bin.
+Similarly, in underwater visual surveys, fish lengths might be recorded to
+the nearest 1~cm \citep{mcco16} or 5~cm \citep{rwnz11},
+generating size-frequency data of counts per length bin.
+For historical data, all that may be available is
+digitisation of points from a
+published figure and the bin structure has to be
+algebraically determined (e.g.~\citealt{edwa11} in a related context).
+
+Alternatively, data are sometimes binned during analysis. For example,
+\citet{dpmg04} and \citet{bblhw12} binned data into 5-cm length bins to
+calculate size spectra for fish communities in Fiji and the eastern Bering Sea,
+respectively. And some size-spectra calculation methods require binning of
+data to a
+prescribed resolution \citep{\MEE}.
+
+Here we investigate how the bin structure of data affects the fitting of
+size spectra, and whether the bin structure needs to be
+explicitly accounted for.
+To motivate our work and understand issues that can arise when fitting size
+spectra to a complex binned data set,
+we first apply eight existing methods to fit annual size spectra to 30 years of data from the
+North Sea International Bottom Trawl Survey (IBTS).
+The data are the numbers of individuals of each species within each length bin
+that were caught per hour of trawling.
+We use the IBTS data set as an example data set for several reasons: (i) it is an open-access
+data set downloadable from the International Council for the Exploration of the
+Sea (ICES) website, (ii) it is an extensive quality-controlled data set
+consisting of many species across multiple years,
+(iii) we could use the data-processing protocols that were fully
+described by \citet{ffrr12} for their calculation of the Large Fish Indicator,
+(iv) we could use the species-specific length-weight coefficients collated
+by \citet{ffrr12}.
+
+For each year of data we estimate the size-spectrum exponent, $b$. Explicitly
+this is the exponent of the individual size distribution (ISD) and
+is related to the slope of the size spectrum \citep{weke07, \MEE}. We find
+that five methods estimate a significant declining trend in $b$, corresponding
+to a steepening size spectrum (as can be expected from fishing pressure,
+e.g.~\citealt{rg96} and \citealt{dgpr05}). The remaining three methods
+find no significant trend in $b$. Thus, the ecological conclusions differ depending on the
+method used.
+
+However, none of the methods properly take into account the bin structure of the
+data.
+They implicitly assign a single length to all counts within
+a length bin, rather than acknowledging that counts can represent a range of
+values within the length bin. The binned lengths are subsequently converted to
+body masses through species-specific length-weight relationships.
+We illustrate the problems that occur, which are compounded due to
+most of the methods requiring further binning to estimate $b$.
+This motivates investigation of methods to properly account for the bin
+structure.
+
+The likelihood method is the only method that can be extended to properly deal
+with binned data. We therefore develop and test such an extended
+method, which deals with (i) the bin structure of length or body-mass data, and
+(ii) situations giving non-integer counts of fish. The latter occurs because the
+counts (for the IBTS data)
+are standardised to represent the number of fish caught per hour of
+trawling, and also arises with other types of data (e.g.~\citealt{rwnz11}).
+Using simulated body-mass data we find that applying likelihood
+without taking into account the bin structure of the data yields biased
+estimates of $b$, even for high-resolution data. However, the extended
+likelihood method that takes into account the bin
+structure is accurate even
+for low-resolution data. Hence it may not be worth the effort and expense of
+collecting high-resolution data if the bin structure is not accounted for.
+
+We derive the likelihood
+function that fully accounts for species-specific length-weight
+relationships. This allows the bin structure for length data to be properly
+accounted for when converting lengths to weights.
+Applying this function to the IBTS data, we find consistently greater
+(less negative) estimates of $b$ than for the original likelihood method.
+Finally, we develop a new method for plotting such data and the resulting
+ISD that explicitly accounts for the
+bin structure and associated uncertainty.
+
+Our results strengthen and extend those from \citet{\MEE}, where we recommended the use of
+maximum likelihood estimation over the seven other previous methods based on
+simulated (rather than real) data. Here, only the likelihood method can be
+properly extended to deal with the uncertainty associated with binned data.
+
+We finish with recommendations concerning which version of the likelihood method
+to use for particular types of data. To encourage and enable others to implement
+our methods, we provide fully documented and functionalised R code in a new R
+package {\tt sizeSpectra}. It includes instructions and vignettes for reproducing
+all our results, figures and tables (including those in \citealt{\MEE}), and for
+applying our methods to new
+data. It is available in the Supplementary Material
+or can be installed directly from
+\noindent \protect{{\tt https://github.com/andrew-edwards/sizeSpectra}}.
+
+\section{Materials and Methods}
+
+\subsection{Demersal fish data}
+
+For our example data set
+we obtained data collected by the North Sea IBTS from the ICES online Database
+of Trawl Surveys ({\tt
+  http://www.ices.dk/marine-data/data-portals/Pages/DATRAS.aspx}).
+We downloaded the number of
+organisms caught per hour for each species and
+length class for all surveys in Areas~1 to~7 carried out in Quarter~1
+from 1986-2015 (see Supplementary Material for full details).
+All surveys followed standardized
+gear- and data-collection protocols \citep{ices15}.
+We followed
+\citet{ffrr12} in removing all non-demersal fish.
+During surveys, lengths were recorded as rounded
+down to the nearest 1~cm [or 0.5~cm for Atlantic Herring (\emph{Clupea
+  harengus}) and European Sprat (\emph{Sprattus sprattus})].
+We averaged counts of the same year/species/length-class combination
+across the seven areas.
+For simplicity this ignores potential differences in
+sampling effort due to variations in haul duration, trawl speed and net area,
+and fits a common size spectrum for the whole region.
+
+For each species, $s$, the length-weight relationship is
+\eb
+w = \alpha_s l^{\beta_s},
+\label{lw}
+\ee
+where $w$ is the estimated body mass (g) of an individual, $l$ is the known
+body length (cm), and $\alpha_s$ and $\beta_s$ are species-specific parameters
+published by \citet{ffrr12}. Following \citet{ffrr12}, for $l$ we initially use
+the `Length class' value (see
+Table~\ref{tab:egData} for examples), which represents the minimum of possible
+lengths for a given fish (i.e.~a `Length class' of 35~cm represents fish in the
+range 35-36~cm). This is consistent with, for example, \citet{blan05} and
+\citet{dgpr05}, the latter also doing this for 5-cm and 10-cm length
+bins. For example, a 45-cm Smallspotted Catshark is assigned a calculated
+body mass of $\alpha_s l^ {\beta_s} = 0.0031 \times 45^{3.0290} = 315.46$~g
+(first row of Table~\ref{tab:egData}). In 1986 there were 0.00714~h$^{-1}$ of such fish caught,
+resulting in a total biomass per hour of trawling of
+2.25~g~h$^{-1}$ (Table~\ref{tab:egData}).
+
+Following calculations of size spectra for earlier IBTS data \citep{pj05} and
+Celtic Sea groundfish surveys \citep{blan05}, we remove all resulting body
+masses estimated to be $<4$~g because small fish will not be effectively sampled by
+the gear. The resulting data set (Table~\ref{tab:egData}) contains the required
+information to estimate the size-spectrum exponent of the community for each
+year. It consists of a dataframe with 42,298 rows, where each row is a unique
+combination of year, species and length class. Each year has between 57 and 81
+unique species.
+
+\subsection{Individual size distribution}
+
+We designate the random variable $X$ to represent the mass (g) of an individual fish
+or other organism. Then, considering $X$ to come from a bounded power-law (PLB)
+distribution, the probability density function for $X$ is \eb f(x) = C
+x^b,~~~~\xmin \leq x \leq \xmax
+\label{PLB}
+\ee where \eb C = \left\{ \begin{array}{ll} \dfrac{b + 1}{\xmax^{~b + 1} -
+    \xmin^{~b + 1}}, \vspace{2mm} & b \neq -1, \\ \dfrac{1}{\log \xmax - \log
+    \xmin}, & b = -1,
+  \end{array}
+  \right.
+\label{PLB.C}
+\ee $x$ represents possible values of $X$, $\log$ is the natural logarithm, $b$
+is the size-spectrum exponent, and $\xmin$ and $\xmax$ are the minimum and
+maximum possible values of the data with $0 < \xmin < \xmax$ \citep{\MEE}. The
+exponent $b$ is expected to be negative, and is the quantity of interest when
+analysing size spectra. Equation~(\ref{PLB}) is the ISD,
+and the resulting biomass size spectrum (biomass density function) for a
+community of $n$ individuals is
+\eb
+B(x) = n C x^{b+1},~~~~\xmin \leq x \leq \xmax.
+\label{biomass}
+\ee
+For length size spectra $x$ would represent lengths, but (\ref{biomass}) cannot
+be directly used \citep{\MEE}.
+
+\subsection{Estimating $b$ for each year of the demersal fish data}
+
+We apply eight methods for fitting size spectra that have been
+previously used in publications and in the
+R package {\tt mizer} \citep{sba14}. The methods were
+documented by \citet{\MEE}. Here, the Supplementary Material explains how
+the methods need to be adapted to deal with the fact that the data are not
+simply measurements of each individual fish; full results are also given.
+Using each method we calculate
+the size-spectrum exponent $b$ separately for each year of data.
+This gives us a time series of estimated annual values of $b$
+with confidence intervals, one time series for each method. We then fit a
+weighted linear regression (that uses the confidence intervals) to each
+time series to see whether there is a
+significant change ($p < 0.05$) in $b$ through time. For clarity we now
+present the results which then motivate development of further methods.
+
+\section{Results}
+
+The linear regression results for each method (Figure~\ref{fig:nSeaFung/nSeaFungTrends}) show that
+(a) the absolute estimates of
+$b$ are highly dependent upon the method used, (b) the confidence intervals
+can vary in size through time and are far broader for some methods than
+for others,
+and (c) there is no significant change in $b$ through time when
+using three of the methods
+yet a significant negative trend (steepening of the size spectrum)
+when using the remaining five methods.
+This latter point shows that
+methodological differences can lead to
+differing ecological conclusions.
+
+\subsection{Dealing with the bin structure of the data}
+
+However, the aforementioned analyses (Figure~\ref{fig:nSeaFung/nSeaFungTrends})
+implicitly ignore the fact that using the
+minimum of a length
+bin, and converting that to a single body mass, does not properly account for
+the bin structure of the data (because the assigned length can actually correspond to any true
+length within a bin). We demonstrate this issue using length-weight parameters
+for relationship (\ref{lw}) for two example species considered by \citet{blan05},
+namely $\alpha_s= $0.0255 and $\beta_s=$2.7643 for Lemon Sole ({\it Microstomus
+  kitt}) and $\alpha_s=$0.001 and $\beta_s=$3.4362 for Common Ling ({\it Molva
+  molva}).
+
+
+Figure \ref{fig:binFigs/binLW} shows how six 5-cm length bins get converted into
+six body-mass bins via (\ref{lw}).
+For clarity we use length bins of width 5~cm and use the midpoint of a
+length bin to calculate the resulting body
+mass (note that the IBTS data mostly uses 1-cm bins and
+was analysed above using the minima of length bins rather than midpoints).
+The resulting body-mass bins in Figure \ref{fig:binFigs/binLW} are not of equal
+width because of the nonlinear nature of the length-weight relationships. And
+the body-mass bins differ between species because of the species-specific
+length-weight parameters. Such information regarding the body-mass bins was not
+explicitly accounted for in the above analyses of the IBTS data; all methods
+used a body mass obtained from applying (\ref{lw}) to the minimum of a length
+bin.
+
+Figure \ref{fig:binFigs/binLWlog} shows the consequence of using the resulting
+body-mass values, converted from the midpoints of the length bins, when using
+methods to fit size spectra that require further binning of the data. For
+example, the LBbiom
+(logarithmic binning to fit biomass size spectrum)
+and LBNbiom (logarithmic binning with normalisation to fit biomass size
+spectrum)
+methods were used by \citet{jd05} and
+\citet{pj05}, respectively, to calculate trends in size-spectra slopes for
+earlier IBTS data. Explicitly shown is the assignment of the body-mass values
+into bins with bin breaks of 4, 8, 16, 32, ..., as would be used in the LBbiom
+and LBNbiom methods.
+
+For example, consider blue length-bin number~5 that is highlighted in
+Figure~\ref{fig:binFigs/binLW} for Lemon Sole and covers the range
+30-35~cm. Say there are 20 individual Lemon Sole that have lengths in this
+range. All 20 individuals would be represented by the length equal to the
+midpoint of the length bin, namely 32.5~cm, which gets converted to a body-mass
+value of 385~g (even though the 20 body masses really lie in the range
+309-473~g). This value of 385~g lies within the $\logtwo$ bin that spans
+256-512~g (see Bin~5 in Figure~\ref{fig:binFigs/binLWlog}). Therefore, all 20
+individuals get assigned a body mass of 384~g, which is the midpoint of the
+$\logtwo$ bin. So, in the LBbiom and LBNbiom methods, all 20 individuals with
+body masses in the range 309-473~g are assigned body masses of 384~g. The
+uncertainty in the original lengths
+(which is often an unavoidable consequence of measurement methods)
+is not explicitly accounted for.
+
+Furthermore, the length range 20-25~cm (Bin~3 in Figures~\ref{fig:binFigs/binLW}
+and~\ref{fig:binFigs/binLWlog}) represents fish in the range 101-187~g.  The
+midpoint of 22.5~cm gets converted to a body-mass value of 139~g, which lies
+within the $\logtwo$ bin that spans 128-256~g
+(Figure~\ref{fig:binFigs/binLWlog}). All individuals then get assigned a body
+mass of 192~g (the midpoint of the $\logtwo$ bin), but this is \emph{greater}
+than the body mass of any of the individuals (101-187~g).  A similar undesirable
+situation occurs for Bin~6 (Figure~\ref{fig:binFigs/binLWlog}).  None of the
+remaining bins yield counts in $\logtwo$ bins that accurately represent the
+original length bins (since there is no reason that they should).
+
+
+Similar situations also occur for the remaining four methods that involve
+further binning of data.
+The LCD (logarithmic plotting of one minus the cumulative distribution) and
+MLE (maximum likelihood estimate)
+methods do not bin data and so do not
+suffer from the extra binning described in Figure~\ref{fig:binFigs/binLWlog},
+but do suffer from assigning the same body mass to all individuals in a
+length bin.
+It is not clear how the LCD method could be extended to account for the bin
+structure. The
+MLE method is the only method to accurately estimate $b$ and its confidence
+intervals for unbinned data \citep{\MEE} --
+this motivates our MLEbin
+method, which adapts the MLE method to explicitly account for the uncertainty
+inherent in binned data.
+
+
+
+\subsection{Likelihood methods for binned data}
+
+\subsubsection{MLEmid method}
+
+The simplest way to deal with binned data in a likelihood framework is to just
+use the midpoints of the body-mass bins, which we call the MLEmid (maximum
+likelihood estimate based on mid-points) method. If there is, say, a count of 10
+individuals assigned to the bin that spans the body-mass range 4-8~g, then all
+10 individuals are assumed to have a body mass of 6~g (the midpoint, though
+recall that for the IBTS data we followed \citealt{ffrr12} in using the minimum value for all eight methods,
+including MLE). In
+the Supplementary Material we derive the likelihood function for count data in
+general and explain how this is used for the MLEmid method.
+
+\subsubsection{MLEbin method}
+
+The MLEbin (maximum likelihood estimate based on binning) method calculates the
+MLE for $b$ by explicitly accounting for the fact that each count represent
+values within its respective size bin. So for 10 individuals in the body-mass
+bin 4-8~g, the MLEbin method uses a likelihood function that explicitly accounts
+for the uncertainty in the 10 individual body masses. The body masses can be
+anywhere in the range 4-8~g, rather than assuming that they are all 6~g as for
+the MLEmid method. The likelihood function for the MLEbin method was derived as
+equations (A.70) and (A.75) in \cite{\MEE}.
+
+\subsubsection{Testing the MLEmid and MLEbin methods using simulated data}
+
+We now simulate data to test the two methods. Following \citet{\MEE} we generate
+10,000 simulated data sets, each containing 1,000 independent random numbers
+(body masses)
+drawn from the bounded power-law distribution (\ref{PLB}) with $b=-2$, $\xmin=1~$g
+and $\xmax=1,000~$g. We bin each simulated data set to
+represent the effect of collecting data in a binned form.
+We then test how well
+the MLEmid and MLEbin methods estimate $b=-2$ only using the information from
+the binned data set (i.e. the bin definitions and the count in each bin), by
+maximising the appropriate likelihood function and using the profile
+likelihood-ratio test \citep{hm97} to calculate confidence intervals.
+
+We test four binning types. Type `Linear 1' uses bins that all
+have a constant bin width of 1~g and that span the data. The first bin starts at
+the integer below the lowest data point.
+Similarly, `Linear 5' and `Linear 10' use bins of constant widths 5~g
+and 10~g, respectively. The binning type `2k' refers to bin widths that double in
+size, span the data, and have bin breaks that are integer powers of 2 (i.e. are
+at $2^k$~g where $k$ is an integer, giving bin breaks at 1, 2, 4, 8, 16, ...).
+
+Figure~\fitMLEhists~shows that the MLEbin method clearly performs better than
+the MLEmid method for all binning types (the histograms are centered around the
+true value of $b=-2$); summary statistics are given in the Supplementary
+Material. The MLEmid method always overestimates $b$, whereas the
+MLEbin gives roughly the same results regardless of the binning (with mean and median
+estimates of $b$ of -1.99 or -2.00). Thus the MLEbin method removes the bias
+associated with the MLEmid method (note that we cannot formally prove this
+is always true as there is no analytical solution for the MLE of $b$, but it
+also holds for all simulation results in the Supplementary Material).
+
+Somewhat surprisingly, the MLEmid method is biased even for the `Linear 1'
+binning type. So, binning the data using bin breaks of 1, 2, 3, ..., 999, 1000~g
+and then using the midpoint of a bin to represent all counts in that bin in a
+likelihood context, gives a biased estimate of $b$ (99\% of the simulations
+over-estimated $b$). This means that for, say, body-mass data that span the
+range 1~g to 1~kg and are measured to a resolution of 1~g, ignoring the fact
+that the binned data represent values in a range (i.e. using the MLEmid method)
+will lead to biased values of the exponent $b$. The reason for this is the very
+skewed nature of the power-law distribution. For example,
+for the simulated data set
+shown in Figure~S.41 of the
+Supplementary Material, the
+bin covering the range 1-2~g has a count of 528, but 348 (66\%) of these values
+are actually $<1.5$~g; the MLEmid method assumes that all values equal
+1.5~g. Whereas the MLEbin method, by definition, accounts for the fact that the
+values within a bin are assumed to exhibit a power-law distribution.
+
+
+For the `Linear 10' binning type, the MLEmid method performs particularly poorly
+(Figure~\fitMLEhists(e)). But, perhaps unexpectedly, the corresponding MLEbin method in
+Figure~\fitMLEhists(f) leads to accurate estimation of $b$, and furthermore has
+better accuracy than the MLEmid method with the finer `Linear 1' binning type in
+Figure~\fitMLEhists(a).
+Therefore, the MLEbin method outperforms the MLEmid method, even when it
+is using data collected at a coarser resolution (10~g vs 1~g) than than the MLEmid method.
+This shows that expending additional time and money to collect
+high-resolution data
+is not
+worthwhile if the bin structure is unaccounted for -- it is better to collect
+low-resolution data and use the MLEbin method to account for the bin structure.
+
+The `2k' binning type performs slightly better than `Linear 10' when using the
+MLEbin method (Figures~\fitMLEhists(f) and~(h)) because it has higher resolution
+for the data-rich lower bins (bin breaks are 1, 2, 4, 8, ..., compared to 1, 11,
+21, 31, ..., for `Linear 10').
+
+The results regarding confidence intervals (Figure~\fitMLEconfs) give a similar
+conclusion. For the MLEmid method and `Linear 1' binning type, only 46\% of the
+95\% confidence intervals contain the true value of $b$, less than half of the
+desired observed coverage of 95\%. The results are worse as the bin width
+increases (`Linear 5' and `Linear 10') and for bin widths that double
+(`2k'). However, the MLEbin gives reliable confidence intervals (observed
+coverage of 94\% or 95\%) regardless of binning type.
+
+Thus, these results demonstrate that for binned data the MLEmid method is
+inaccurate and the MLEbin method should be used, even for seemingly narrow bins.
+
+\subsubsection{The MLEbins method  --  accounting for species-specific body-mass bins}
+
+The IBTS data has species-specific length-weight
+relationships, such that the
+body-mass bins are different for each species, as occurs for many data sets;
+e.g.~\citet{mnwb18} had lengths of 1-cm resolution that were
+converted into body masses (and then used for the LBNbiom method).
+To account for this we extend the MLEbin
+method to the MLEbins method, using a multinomial
+log-likelihood function \citep{lawl03}; see Supplementary Material.
+
+\subsection{MLEbins method applied to IBTS data}
+
+To apply the MLEbins method to the IBTS data we first need to calculate
+species-specific body-mass bins that result from the species-specific
+length-weight coefficients (as for Figure~\ref{fig:binFigs/binLW}).
+Figure~\ref{fig:nSeaFung/nSeaFungBins1} shows how the 1-cm (or 0.5-cm) length
+bins for 45 of the species get converted to body-mass bins. The conversions are
+different for each species because of the different values of the length-weight
+coefficients. Thus, the vertical bars are analogous to those in
+Figure~\ref{fig:binFigs/binLW}. Figure~\ref{fig:nSeaFung/nSeaFungBins1} shows
+that even though the length bins are only 1~cm wide, the resulting individual
+body-mass bins can be quite large; the widest bin across all species is 832~g for
+Atlantic Cod (\emph{Gadus morhua}) [see Supplementary Material].
+
+In Figure~\ref{fig:ISD-1999.main} we introduce a plotting technique
+that visualises the binning structure of the data and the fit of the ISD
+(from using the MLEbins method).
+The fitted PLB model shows
+a reasonable fit to the 1999 data (the red curve passing through the grey
+rectangles) for body masses $<100$~g; for larger body masses the PLB model
+generally over-estimates the numbers of individuals. This pattern is seen for
+many of the years (see Supplementary Material for figures)
+and may potentially be a consequence of fishing pressure.
+
+
+Using the species-specific MLEbins method applied to each year of the IBTS data, we obtain
+consistently higher estimates of $b$ than for the original MLE method
+(Figure~\ref{fig:nSeaFung/nSeaFungCompareTrends}).
+The differing estimates of $b$ show that the likelihood method did need to be
+properly adapted (the MLEbins method) to deal with the binned nature of the
+data.
+In this case, both methods conclude that there is no significant temporal trend
+in $b$ through time (see Supplementary Material). Nevertheless, the results show
+the potential for different conclusions about community structure to be reached
+if the bin structure of data is not properly considered.
+
+\subsection{Recommendations}
+
+In Table~\ref{tab:recommend} we recommend fitting methods based on the type
+and resolution of data available.
+If data are available in unbinned form (e.g.~\citealt{tdss15})
+then the MLE method can be used, but this still depends on the accuracy of the raw
+data. Given that unbinned data are
+essentially (to some resolution) binned data,
+given the results in Figures~\fitMLEhists\ and~\fitMLEconfs\ we recommend
+testing the MLE versus MLEbin method for the particular bin structure and range
+of a data set.
+Or one could just use the MLEbin method, with the bin structure
+defined by the accuracy of the measurements.
+Our methods may need to be tailored for explicit data sets depending on the
+survey design -- in Table~\ref{tab:recommend} we give an example concerning
+monitoring of Pacific reefs.
+
+\section{Discussion}
+
+We have analysed a rich 30-year data set from the North Sea, and found that
+ecological conclusions regarding apparent trends in size-spectra exponent can depend on
+the method used to estimate the exponent. Furthermore, the likelihood method
+needs to properly account for the binned nature of data (giving the MLEbin
+method). Using simulated data, even for
+seemingly high-resolution data the likelihood method that does not account for
+the binning (the MLEmid method) is biased, whereas MLEbin is not.
+For data, such as the IBTS data, where lengths have to be converted to body
+masses using species-specific length-weight coefficients, we have derived
+the MLEbins method to estimate $b$ and developed a technique for plotting the
+data and the resulting fit.
+
+Following \citet{\MEE} we have used a bounded power-law distribution for the ISD
+because power laws are commonly used models for size spectra \citep{pd78, bd92}
+and alternative models of size-structured predator-prey dynamics predict
+that the aggregate community ISD may indeed be
+close to a power law \citep{ab06}.
+Future work could focus on relaxing the
+assumption of a power-law distribution
+if other distributions are deemed feasible \citep{\MEE}.
+Using a bounded (rather than unbounded) distribution avoids extrapolation
+beyond the range of the data -- this regrettably prevents estimation
+of the population density of Loch Ness monsters (as per \citealt{sk72}).
+Since power-law distributions have many applications in ecology \citep{weg08},
+our simulation results suggest that bin structure may need to be accounted for
+in other contexts, and that our novel plotting method
+(Figure~\ref{fig:ISD-1999.main}) would be similarly applicable.
+
+Ideally, our methods could be extended to
+incorporate estimated uncertainties of the species-specific length-weight
+coefficients (see \citealt{froese06}). This would provide further
+uncertainty regarding the body mass associated with each length bin
+(see \citealt{bbmr19} for an explicit example from raw data).
+However, practical applications could be limited since published tabulations of
+length-weight relationships do not generally include confidence intervals for the parameters
+(e.g., \citealt{lyt02, robins10, ffrr12}).
+
+
+Following \citet{pj05} and \citet{blan05} we used a (minimum) cutoff of 4~g to
+analyse the IBTS data. This was necessarily done by converting the minima of the
+length bins into species-specific body-mass bins, and then only using the
+resulting bins with minima $\geq$4~g.  For a resulting body-mass bin of
+3-5~g, for example, this approach removes some individuals $\geq$4~g, even though we wish to
+impose a minimum of 4~g. This may be unavoidable, although note that the
+likelihood function for the MLEbins method properly assumes no data (rather than no
+individuals) $<$5~g for such a species with lowest bin 3-5~g [$w_{s,1} = 5$~g
+for this species in (S.18) in the Supplementary Material].
+Also note that we have estimated $\xmax$ separately for each year although it
+could be set to a fixed maximum value across all years.
+
+There are techniques available for finding the value of $\xmin$ that gives the
+best fit of an unbounded power law \citep{csn09, gilles15}.
+But these are focussed on finding power-law \emph{tails} (given the optimum
+$\xmin$), rather than finding a distribution that fits the full size range of
+the sampled community, which is what is desired when fitting size spectra.
+Such techniques would have to be adapted to use our binned likelihood methods (and to
+use the bounded rather than unbounded power-law distribution).
+Rather, we recommend that the range
+of data be justified from biological and sampling perspectives, rather than adjusting
+the range to most closely resemble a power-law distribution. This is particularly
+so when comparing fits across multiple years or locations because $\xmin$ should be
+consistent; e.g.~\citet{robins17} fixed $\xmin = 20$~g for all data sets from 38
+Pacific islands.
+We have re-run our analyses of the IBTS data with a
+cutoff value of 100~g (much higher than the original 4~g). The
+exponent $b$ is much lower for all years, and increases through time rather than not
+changing (see Supplementary Material). This emphasises the need for careful
+biological consideration of the cutoff value in such applications.
+
+We have used the IBTS data to motivate development of widely applicable
+methods. We caution against using our current results for management purposes
+concerning the North Sea, because we have not fully explored assumptions (such
+as those just discussed) and have used all the sampled species rather than only
+a well-sampled subset (as recommended by \citealt{jd05}). Also, the power
+analyses conducted by \citet{jd05} on earlier IBTS data could be repeated, in
+particular to determine the lower cutoff value that would provide the greatest
+power to detect trends in the size-spectrum exponent. Note that \citet{jd05}
+were restricted to such cutoffs being powers of two because of the use of the
+LBbiom method, but this would not be necessary with the MLEbins method.
+
+
+Note that the confidence intervals calculated for the IBTS data
+from the MLEbins method
+are not strictly true confidence intervals, because the commonly-used unit of `numbers
+of individuals caught per hour of trawling' is arbitrary. If numbers were
+instead expressed as `per day of trawling' then all counts would be divided by
+24, and
+the resulting confidence intervals would be larger than those in
+Figure~\ref{fig:nSeaFung/nSeaFungCompareTrends}.
+True confidence intervals could be obtained by using the absolute numbers of
+individual fish caught summed across all areas (rather than numbers per hour of
+trawling averaged across areas); this should be investigated if conducting
+further analyses of such types of data.
+This would change the width of the confidence intervals, but not the MLE for
+$b$, which is unaffected by any change in units.
+
+All results, figures and tables presented here are reproducible in our R package
+{\tt sizeSpectra}. The code is properly documented and functionalised. The included
+vignettes will enable users to fit size spectra to their own data using our recommended
+and tested likelihood methods that properly account for the bin structure of the data.
+
+%TC:ignore
+\section*{Supplementary Material}
+
+The following supplementary material is included:
+(A)~document containing further methodological details, including derivations
+of appropriate likelihood functions, further results for the IBTS and
+the simulated data, and a summary of the {\tt sizeSpectra} R package;
+(B)~code repository (our new {\tt sizeSpectra} R package) such that all results can be reproduced and users
+can apply the methods to their own data.
+
+\section*{Acknowledgements}
+
+We thank Carrie Holt, Brooke Davis, Jaclyn Cleary and Jennifer Boldt for useful
+discussions, and Sean Anderson for tutorials on creating R packages. We thank
+the two anonymous reviewers for their thoughtful and positive comments that have
+helped improve this work.
+% TC:endignore
+
+
+%TC:incbib
+
+\begin{thebibliography}{}
+
+\bibitem[\'Alvarez {\em et~al.}(2016)]{amln16}
+\'Alvarez, E., Mor\'an, X. A.~G., L\'opez-Urrutia, A., and Nogueira, E. (2016).
+\newblock {Size-dependent photoacclimation of the phytoplankton community in
+  temperate shelf waters (southern Bay of Biscay)}.
+\newblock {\em Mar.~Ecol.~Prog.~Ser.}, {\bf 543}, 73--87.
+
+\bibitem[Andersen and Beyer(2006)]{ab06}
+Andersen, K.~H. and Beyer, J.~E. (2006).
+\newblock Asymptotic size determines species abundance in the marine size
+  spectrum.
+\newblock {\em Am.~Nat.}, {\bf 168}, 54--61.
+
+\bibitem[Benoist {\em et~al.}(2019)]{bbmr19}
+Benoist, N. M.~A., Bett, B.~J., Morris, K.~J., and Ruhl, H.~A. (2019).
+\newblock A generalised volumetric method to estimate the biomass of
+  photographically surveyed benthic megafauna.
+\newblock {\em Prog.~Oceanogr.}, {\bf 178}, 102188.
+
+\bibitem[Blanchard {\em et~al.}(2005)]{blan05}
+Blanchard, J.~L., Dulvy, N.~K., Jennings, S., Ellis, J.~R., Pinnegar, J.~K.,
+  Tidd, A., and Kell, L.~T. (2005).
+\newblock Do climate and fishing influence size-based indicators of {C}eltic
+  {S}ea fish community structure?
+\newblock {\em ICES J.~Mar.~Sci.}, {\bf 62}, 405--411.
+
+\bibitem[Boldt {\em et~al.}(2012)]{bblhw12}
+Boldt, J.~L., Bartkiw, S.~C., Livingston, P.~A., Hoff, G.~R., and Walters,
+  G.~E. (2012).
+\newblock Investigation of fishing and climate effects on the community size
+  spectra of eastern {B}ering {S}ea fish.
+\newblock {\em Trans.~Am.~Fish.~Soc.}, {\bf 141}, 327--342.
+
+\bibitem[Boudreau and Dickie(1992)]{bd92}
+Boudreau, P.~R. and Dickie, L.~M. (1992).
+\newblock Biomass spectra of aquatic ecosystems in relation to fisheries yield.
+\newblock {\em Can. J. Fish. Aquat. Sci.}, {\bf 49}, 1528--1538.
+
+\bibitem[Clauset {\em et~al.}(2009)]{csn09}
+Clauset, A., Shalizi, C.~R., and Newman, M. E.~J. (2009).
+\newblock Power-law distributions in empirical data.
+\newblock {\em SIAM Rev.}, {\bf 51}, 661--703.
+
+\bibitem[Constable {\em et~al.}(2016)]{consta16}
+Constable, A.~J., Costa, D.~P., Schofield, O., Newman, L., {Urban Jr.}, E.~R.,
+  Fulton, E.~A., Melbourne-Thomas, J., Ballerini, T., Boyd, P.~W., Brandt, A.,
+  de~la Mare, W.~K., Edwards, M., El\'eaume, M., Emmerson, L., Fennel, K.,
+  Fielding, S., Griffiths, H., Gutt, J., Hindell, M.~A., Hofmann, E.~E.,
+  Jennings, S., La, H.~S., Mc{C}urdy, A., Mitchell, B.~G., Moltmann, T.,
+  Muelbert, M., Murphy, E., Press, A.~J., Raymond, B., Reid, K., Reiss, C.,
+  Rice, J., Salter, I., Smith, D.~C., Song, S., Southwell, C., Swadling, K.~M.,
+  {Van de Putte}, A., and Willis, Z. (2016).
+\newblock {Developing priority variables (``ecosystem Essential Ocean
+  Variables'' -- eEOVs) for observing dynamics and change in Southern Ocean
+  ecosystems}.
+\newblock {\em J.~Mar.~Syst.}, {\bf 161}, 26--41.
+
+\bibitem[Daan {\em et~al.}(2005)]{dgpr05}
+Daan, N., Gislason, H., Pope, J.~G., and Rice, J.~C. (2005).
+\newblock Changes in the {N}orth {S}ea fish community: evidence of indirect
+  effects of fishing?
+\newblock {\em ICES J.~Mar.~Sci.}, {\bf 62}, 177--188.
+
+\bibitem[Dulvy {\em et~al.}(2004)]{dpmg04}
+Dulvy, N.~K., Polunin, N. V.~C., Mill, A.~C., and Graham, N. A.~J. (2004).
+\newblock Size structural change in lightly exploited coral reef fish
+  communities: evidence for weak indirect effects.
+\newblock {\em Can. J. Fish. Aquat. Sci.}, {\bf 61}, 466--475.
+
+\bibitem[Edwards(2011)]{edwa11}
+Edwards, A.~M. (2011).
+\newblock Overturning conclusions of {{L}}\'evy flight movement patterns by
+  fishing boats and foraging animals.
+\newblock {\em Ecology}, {\bf 92}, 1247--1257.
+
+\bibitem[Edwards {\em et~al.}(2017)]{erpbb17}
+Edwards, A.~M., Robinson, J. P.~W., Plank, M.~J., Baum, J.~K., and Blanchard,
+  J.~L. (2017).
+\newblock Testing and recommending methods for fitting size spectra to data.
+\newblock {\em Meth.~Ecol.~Evol.}, {\bf 8}, 57--67.
+
+\bibitem[{European~Commission}(2010)]{europe10}
+{European~Commission} (2010).
+\newblock {Commission decision of 1 September 2010 on criteria and
+  methodological standards on good environmental status of marine waters}.
+\newblock {\em Off. J. Eur. Union}, {\bf L232}, 14--24.
+
+\bibitem[Froese(2006)]{froese06}
+Froese, R. (2006).
+\newblock Cube law, condition factor and weight-length relationships: history,
+  meta-analysis and recommendations.
+\newblock {\em J. Appl. Ichthyol.}, {\bf 22}, 241--253.
+
+\bibitem[Fung {\em et~al.}(2012)]{ffrr12}
+Fung, T., Farnsworth, K.~D., Reid, D.~G., and Rossberg, A.~G. (2012).
+\newblock Recent data suggest no further recovery in {N}orth {S}ea {L}arge
+  {F}ish {I}ndicator.
+\newblock {\em ICES J.~Mar.~Sci.}, {\bf 69}, 235--239.
+
+\bibitem[Gillespie(2015)]{gilles15}
+Gillespie, C.~S. (2015).
+\newblock {Fitting heavy tailed distributions: The poweRlaw package}.
+\newblock {\em J.~Stat.~Softw.}, {\bf 64}, 1--16.
+
+\bibitem[Heenan {\em et~al.}(2016)]{heen16}
+Heenan, A., Gorospe, K., Williams, I., Levine, A., Maurin, P., Nadon, M.,
+  Oliver, T., Rooney, J., Timmers, M., Wongbusarakum, S., and Brainard, R.
+  (2016).
+\newblock Ecosystem monitoring for ecosystem-based management: using a
+  polycentric approach to balance information trade-offs.
+\newblock {\em J.~Appl.~Ecol.}, {\bf 53}, 699--704.
+
+\bibitem[Hilborn and Mangel(1997)]{hm97}
+Hilborn, R. and Mangel, M. (1997).
+\newblock {\em The Ecological Detective: Confronting Models with Data}.
+\newblock Vol.~28, Monographs in Population Biology, Princeton University
+  Press, New Jersey.
+
+\bibitem[ICES(2015)]{ices15}
+ICES (2015).
+\newblock {Manual for the International Bottom Trawl Surveys}.
+\newblock Series of ICES Survey Protocols SISP 10 -- IBTS IX. 86~p.
+
+\bibitem[Jennings(2005)]{jenn05}
+Jennings, S. (2005).
+\newblock Indicators to support an ecosystem approach to fisheries.
+\newblock {\em Fish Fish.}, {\bf 6}, 212--232.
+
+\bibitem[Jennings and Dulvy(2005)]{jd05}
+Jennings, S. and Dulvy, N.~K. (2005).
+\newblock Reference points and reference directions for size-based indicators
+  of community structure.
+\newblock {\em ICES J.~Mar.~Sci.}, {\bf 62}, 397--404.
+
+\bibitem[Kelly-Gerreyn {\em et~al.}(2014)]{kellyg14}
+Kelly-Gerreyn, B.~A., Martin, A.~P., Bett, B.~J., Anderson, T.~R., Kaariainen,
+  J.~I., Main, C.~E., Marcinko, C.~J., and Yool, A. (2014).
+\newblock Benthic biomass size spectra in shelf and deep-sea sediments.
+\newblock {\em Biogeosciences}, {\bf 11}, 6401--6416.
+
+\bibitem[Lawless(2003)]{lawl03}
+Lawless, J.~F. (2003).
+\newblock {\em Statistical Models and Methods for Lifetime Data}.
+\newblock 2nd ed., Wiley series in Probability and Statistics, Wiley, New
+  Jersey.
+
+\bibitem[Love {\em et~al.}(2002)]{lyt02}
+Love, M.~S., Yoklavich, M., and Thorsteinson, L. (2002).
+\newblock {\em The Rockfishes of the Northeast Pacific}.
+\newblock University of California Press, Berkeley and Los Angeles, California.
+
+\bibitem[Maxwell and Jennings(2006)]{mj06}
+Maxwell, T. A.~D. and Jennings, S. (2006).
+\newblock Predicting abundance-body size relationships in functional and
+  taxonomic subsets of food webs.
+\newblock {\em Oecologia}, {\bf 150}, 282--290.
+
+\bibitem[McCoy {\em et~al.}(2016)]{mcco16}
+McCoy, K., Heenan, A., Asher, J., Ayotte, P., Gorospe, K., Gray, A., Lino, K.,
+  Zamzow, J., and Williams, I. (2016).
+\newblock {Pacific Reef Assessment and Monitoring Program data report.
+  Ecological monitoring 2015 -- reef fishes and benthic habitats of the main
+  Hawaiian Islands, Northwest Hawaiian Islands, Pacific Remote Island Areas,
+  and American Samoa}.
+\newblock PIFSC Data Report DR-16-002.
+
+\bibitem[Mindel {\em et~al.}(2018)]{mnwb18}
+Mindel, B.~L., Neat, F.~C., Webb, T.~J., and Blanchard, J.~L. (2018).
+\newblock Size-based indicators show depth-dependent change over time in the
+  deep sea.
+\newblock {\em ICES J.~Mar.~Sci.}, {\bf 75}, 113--121.
+
+\bibitem[Monnahan {\em et~al.}(2016)]{monn16}
+Monnahan, C.~C., Ono, K., Anderson, S.~C., Rudd, M.~B., Hicks, A.~C.,
+  Hurtado-Ferro, F., Johnson, K.~F., Kuriyama, P.~T., Licandeo, R.~R., Stawitz,
+  C.~C., Taylor, I.~G., and Valero, J.~L. (2016).
+\newblock The effect of length bin width on growth estimation in integrated
+  age-structured stock assessments.
+\newblock {\em Fish.~Res.}, {\bf 180}, 103--112.
+
+\bibitem[Piet and Jennings(2005)]{pj05}
+Piet, G.~J. and Jennings, S. (2005).
+\newblock Response of potential fish community indicators to fishing.
+\newblock {\em ICES J.~Mar.~Sci.}, {\bf 62}, 214--225.
+
+\bibitem[Platt and Denman(1978)]{pd78}
+Platt, T. and Denman, K. (1978).
+\newblock The structure of pelagic marine ecosystems.
+\newblock {\em Rapp. P.-v. R{{\'e}}un. Cons. Int. Explor. Mer}, {\bf 173},
+  60--65.
+
+\bibitem[Rice and Gislason(1996)]{rg96}
+Rice, J. and Gislason, H. (1996).
+\newblock Patterns of change in the size spectra of numbers and diversity of
+  the {N}orth {S}ea fish assemblage, as reflected in surveys and models.
+\newblock {\em ICES J.~Mar.~Sci.}, {\bf 53}, 1214--1225.
+
+\bibitem[Rice {\em et~al.}(2012)]{rice12}
+Rice, J., Arvanitidis, C., Borja, A., Frid, C., Hiddink, J.~G., Krause, J.,
+  Lorance, P., Ragnarsson, S.~A., Sk\"old, M., Trabucco, B., Enserink, L., and
+  Norkko, A. (2012).
+\newblock {Indicators for sea-floor integrity under the European Marine
+  Strategy Framework Directive}.
+\newblock {\em Ecol.~Indic.}, {\bf 12}, 174--184.
+
+\bibitem[Richards {\em et~al.}(2011)]{rwnz11}
+Richards, B.~L., Williams, I.~D., Nadon, M.~O., and Zgliczynski, B.~J. (2011).
+\newblock A towed-diver survey method for mesoscale fishery-independent
+  assessment of large-bodied reef fishes.
+\newblock {\em Bull.~Mar.~Sci.}, {\bf 87}, 55--74.
+
+\bibitem[Robinson {\em et~al.}(2017)]{robins17}
+Robinson, J. P.~W., Williams, I.~D., Edwards, A.~M., McPherson, J., Yeager, L.,
+  Vigliola, L., Brainard, R.~E., and Baum, J.~K. (2017).
+\newblock Fishing degrades size structure of coral reef fish communities.
+\newblock {\em Glob.~Change~Biol.}, {\bf 23}, 1009--1022.
+
+\bibitem[Robinson {\em et~al.}(2010)]{robins10}
+Robinson, L.~A., Greenstreet, S. P.~R., Reiss, H., Callaway, R., Craeymeersch,
+  J., {de Boois}, I., Degraer, S., Ehrich, S., Fraser, H.~M., Goffin, A.,
+  Kr\"oncke, I., {Lindal Jorgenson}, L., Robertson, M.~R., and Lancaster, J.
+  (2010).
+\newblock {Length-weight relationships of 216 North Sea benthic invertebrates
+  and fish}.
+\newblock {\em J. Mar. Biol. Assoc. U.K.}, {\bf 90}, 95--104.
+
+\bibitem[Scott {\em et~al.}(2014)]{sba14}
+Scott, F., Blanchard, J.~L., and Andersen, K.~H. (2014).
+\newblock \emph{mizer}: an {R} package for multispecies, trait-based and
+  community size spectrum ecological modelling.
+\newblock {\em Meth.~Ecol.~Evol.}, {\bf 5}, 1121--1125.
+
+\bibitem[Sheldon and Kerr(1972)]{sk72}
+Sheldon, R.~W. and Kerr, S.~R. (1972).
+\newblock {The population density of monsters in Loch Ness}.
+\newblock {\em Limnol.~Oceanogr.}, {\bf 17}, 796--798.
+
+\bibitem[Shin {\em et~al.}(2005)]{srjfg05}
+Shin, Y.-J., Rochet, M.-J., Jennings, S., Field, J.~G., and Gislason, H.
+  (2005).
+\newblock Using size-based indicators to evaluate the ecosystem effects of
+  fishing.
+\newblock {\em ICES J.~Mar.~Sci.}, {\bf 62}, 384--396.
+
+\bibitem[Stasko {\em et~al.}(2016)]{ssmarp16}
+Stasko, A.~D., Swanson, H., Majewski, A., Atchison, S., Reist, J., and Power,
+  M. (2016).
+\newblock {Influences of depth and pelagic subsidies on the size-based trophic
+  structure of Beaufort Sea fish communities}.
+\newblock {\em Mar.~Ecol.~Prog.~Ser.}, {\bf 549}, 153--166.
+
+\bibitem[Taniguchi {\em et~al.}(2014)]{tfp14}
+Taniguchi, D. A.~A., Franks, P. J.~S., and Poulin, F.~J. (2014).
+\newblock Planktonic biomass size spectra: an emergent property of
+  size-dependent physiological rates, food web dynamics, and nutrient regimes.
+\newblock {\em Mar.~Ecol.~Prog.~Ser.}, {\bf 514}, 13--33.
+
+\bibitem[Thorpe {\em et~al.}(2015)]{tllcj15}
+Thorpe, R.~B., {Le~Quesne}, W. J.~F., Luxford, F., Collie, J.~S., and Jennings,
+  S. (2015).
+\newblock Evaluation and management implications of uncertainty in a
+  multispecies size-structured model of population and community responses to
+  fishing.
+\newblock {\em Meth.~Ecol.~Evol.}, {\bf 6}, 49--58.
+
+\bibitem[Trebilco {\em et~al.}(2015)]{tdss15}
+Trebilco, R., Dulvy, N.~K., Stewart, H., and Salomon, A.~K. (2015).
+\newblock The role of habitat complexity in shaping the size structure of a
+  temperate reef fish community.
+\newblock {\em Mar.~Ecol.~Prog.~Ser.}, {\bf 532}, 197--211.
+
+\bibitem[{van~Gemert} and Andersen(2018)]{va18}
+{van~Gemert}, R. and Andersen, K.~H. ({2018}).
+\newblock Implications of late-in-life density-dependent growth for fishery
+  size-at-entry leading to maximum sustainable yield.
+\newblock {\em ICES J.~Mar.~Sci.}, {\bf 75}, 1296--1305.
+
+\bibitem[White {\em et~al.}(2007)]{weke07}
+White, E.~P., Ernest, S. K.~M., Kerkhoff, A.~J., and Enquist, B.~J. (2007).
+\newblock Relationships between body size and abundance in ecology.
+\newblock {\em Trends Ecol.~Evol.}, {\bf 22}, 323--330.
+
+\bibitem[White {\em et~al.}(2008)]{weg08}
+White, E.~P., Enquist, B.~J., and Green, J.~L. (2008).
+\newblock On estimating the exponent of power-law frequency distributions.
+\newblock {\em Ecology}, {\bf 89}, 905--912.
+
+\bibitem[Woodson {\em et~al.}(2018)]{wsj18}
+Woodson, C.~B., Schramski, J.~R., and Joye, S.~B. (2018).
+\newblock A unifying theory for top-heavy ecosystem structure in the ocean.
+\newblock {\em Nat. Commun.}, {\bf 9}, 23.
+
+\bibitem[Yool {\em et~al.}(2017)]{ymabjr17}
+Yool, A., Martin, A.~P., Anderson, T.~R., Bett, B.~J., Jones, D. O.~B., and
+  Ruhl, H.~A. (2017).
+\newblock Big in the benthos: Future change of seafloor community biomass in a
+  global, body size-resolved model.
+\newblock {\em Glob.~Change~Biol.}, {\bf 23}, 3554--3566.
+
+\bibitem[Zhang {\em et~al.}(2018)]{zcxxr18}
+Zhang, C., Chen, Y., Xu, B., Xue, Y., and Ren, Y. (2018).
+\newblock Evaluating fishing effects on the stability of fish communities using
+  a size-spectrum model.
+\newblock {\em Fish.~Res.}, {\bf 197}, 123--130.
+
+\bibitem[Zhou {\em et~al.}(2019)]{zhou19}
+Zhou, S., Kolding, J., Garcia, S.~M., Plank, M.~J., Bundy, A., Charles, A.,
+  Hansen, C., Heino, M., Howell, D., Jacobsen, N.~S., Reid, D.~G., Rice, J.~C.,
+  and {van~Zwieten}, P. A.~M. (2019).
+\newblock Balanced harvest: concept, policies, evidence, and management
+  implications.
+\newblock {\em Rev.~Fish Biol.~Fish.}, {\bf 29}, 711--733.
+
+\end{thebibliography}
+
+
+\clearpage
+
+%%% TABLE 1 %%%
+% Species names
+% latex table generated in R 3.4.3 by xtable 1.8-2 package
+% Tue May 15 15:12:05 2018
+\begin{table}[tp]
+\centering
+\caption{First six and last six rows of the IBTS data to illustrate the
+  information available. Each row represents a unique combination of year,
+  species and length class. `Number' gives the number of individuals per hour of
+  trawling observed for that combination, and can be non-integer because counts
+  of individual fish are scaled by tow duration. Fish lengths are assigned into
+  length classes, where the value of `Length class' (cm) is the minimum value of
+  the 1-cm length bin (or 0.5-cm length bins for Atlantic Herring and European
+  Sprat). Parameters $\alpha_s$ and $\beta_s$ are the length-weight coefficients
+  for species $s$ from \citet{ffrr12}, and `Body mass' (g) is the resulting
+  estimated body mass for an individual of that species and length
+  class. `Biomass' (g~h$^{-1}$) is the total biomass caught per hour of trawling
+  for each row. Example species are Smallspotted Catshark ({\it Scyliorhinus
+    canicula}), Snakeblenny ({\it Lumpenus lampretaeformis}) and Thickback Sole
+  ({\it Microchirus variegatus}). The full data set has 42,298 rows.}
+\label{tab:egData}
+\begin{tabular}{rrrrrrrr}
+  \hline
+  Year & Species & Length & Number & $\alpha_s$ & $\beta_s$ & Body & Biomass\\
+       & & class (cm) & (h$^{-1}$) & & & mass (g) & (g~h$^{-1}$) \\
+  \hline
+  1986 & Smallspotted Catshark & 45 & 0.007 & 0.0031 & 3.0290 & 315.46 & 2.25 \\
+  1986 & Smallspotted Catshark & 46 & 0.007 & 0.0031 & 3.0290 & 337.17 & 2.41 \\
+  1986 & Smallspotted Catshark & 50 & 0.007 & 0.0031 & 3.0290 & 434.05 & 3.10 \\
+  1986 & Smallspotted Catshark & 52 & 0.029 & 0.0031 & 3.0290 & 488.81 & 14.33 \\
+  1986 & Smallspotted Catshark & 53 & 0.011 & 0.0031 & 3.0290 & 517.84 & 5.65 \\
+  1986 & Smallspotted Catshark & 54 & 0.011 & 0.0031 & 3.0290 & 548.00 & 6.18 \\
+  $\cdot \cdot \cdot$ & $\cdot \cdot \cdot$ & $\cdot
+  \cdot \cdot$ & $\cdot \cdot \cdot$ & $\cdot \cdot \cdot$ & $\cdot \cdot \cdot$
+               & $\cdot \cdot \cdot$ & $\cdot \cdot \cdot$ \\
+  2015 & Snakeblenny & 34 & 0.028 & 0.0244 & 2.0439 & 32.93 & 0.92 \\
+  2015 & Thickback Sole & 8 & 0.013 & 0.0080 & 3.1410 & 5.49 & 0.07 \\
+  2015 & Thickback Sole & 14 & 0.039 & 0.0080 & 3.1410 & 31.85 & 1.24 \\
+  2015 & Thickback Sole & 15 & 0.052 & 0.0080 & 3.1410 & 39.55 & 2.05 \\
+  2015 & Thickback Sole & 16 & 0.065 & 0.0080 & 3.1410 & 48.44 & 3.15 \\
+  2015 & Thickback Sole & 17 & 0.013 & 0.0080 & 3.1410 & 58.60 & 0.76 \\
+  \hline
+\end{tabular}
+\end{table}
+
+%%% TABLE 2 %%%
+\begin{table}[tp]
+\centering
+\caption{Recommendations for calculating the size-spectrum exponent,
+  $b$, of the individual size distribution for body masses (equation \ref{PLB}),
+  depending on the type and resolution of the data.}
+\label{tab:recommend}
+\small{
+\begin{tabular}{L{3 cm}L{3 cm}L{5 cm}L{4 cm}}
+\hline
+Data type & Resolution & Issue & Solution \\
+\hline
+  Body mass & Individual body masses & Accuracy of measurements may require them
+                                       to be considered as bins
+          & Simulate data as in Figure~\fitMLEhists~to see if MLE method
+            sufficient or MLEbin is needed\\
+Body mass & Individuals assigned to common body-mass bins & Data are counts in bins
+                               & Use MLEbin method\\
+Length & Individual lengths & Lengths have to be converted to body masses
+       & Calculate individual body masses and proceed as per `individual body masses'\\
+Length & Individuals assigned to length bins &
+         Resulting converted body-mass bins are species specific &
+         Use MLEbins method\\
+Lengths from underwater visual census (e.g.~point counts or belt transects)
+       & Individual lengths
+       & May need to standardise counts when combining different survey designs
+         (e.g.~\citealt{heen16}); surveys may cover different sized areas or
+         count small and large organisms differently
+       & Potential need to adapt MLEbins likelihood function to account for particular
+         survey design \\
+\hline
+\end{tabular}
+}
+\end{table}
+
+\renewcommand{\baselinestretch}{1.1}
+
+\onefigshift{nSeaFung/nSeaFungTrends}{For the IBTS data, each of eight methods is
+  used to estimate the exponent $b$ (circles, with 95\% confidence
+  interval as vertical bars) for each year. The fit of a weighted linear
+  regression with 95\% confidence interval is shown in red if the trend
+  can be considered statistically significant from 0 ($p<0.05$) and in grey if
+  it cannot be ($p \geq 0.05$).
+  The y-axes are the same for (d)-(h). For (g) and (h) the confidence
+  intervals are too narrow to be seen. See Supplementary Material for full
+  details of methods.}{figure1}
+
+
+\onefigshift{binFigs/binLW}{Example length-weight relationships (solid curves)
+  for Lemon Sole ({\it Microstomus kitt}) in blue and Common Ling ({\it Molva
+    molva}) in red, showing how binned length measurements yield ranges of
+  estimated body masses. Horizontal bars show six example 5-cm length bins, the
+  same bins for both species. Using the length-weight relationships, these length
+  bins convert to the body-mass bins shown by the vertical bars, giving six bins
+  of unequal width for each species. The conversion for the 30-35~cm length bin
+  is explicitly shown as dotted lines for the endpoints and solid lines for the
+  midpoint of 32.5~cm. For Lemon Sole, the 30-35~cm bin with midpoint 32.5~cm
+  converts to a body-mass bin of 309-473~g (values
+  rounded to nearest~g for clarity), and for Common Ling the converted body-mass
+  bin is 119-202~g.
+  Note that converting the midpoint of 32.5~cm gives respective body masses of
+  385~g and 157~g, which are slightly
+  less than the respective midpoints of the new body-mass bins (391~g and
+  161~g) because of the nonlinearity of the length-weight relationships.}{figure2}
+
+\clearpage
+
+\onefig{binFigs/binLWlog}{Demonstration of how binned body-mass values
+  (blue bars) get
+  assigned to logarithmic size-class bins (black and grey bars),
+  as occurs for the LBbiom and LBNbiom
+  methods that prescribe the logarithmic bins. Blue vertical bars show the
+  resulting six converted body-mass bins for Lemon Sole from
+  Figure~\ref{fig:binFigs/binLW}. The black and grey vertical bars show
+  body-mass bins that have equal width on a logarithmic scale. Explicitly these
+  are at $4, 8, 16, 32, ...$, as used in the LBbiom and LBNbiom methods. The
+  short horizontal purple lines show the midpoints of those bins. Each panel,
+  labelled Bin~1 to Bin~6, highlights one blue body-mass bin. For each blue bin,
+  the blue arrow starts from the converted value of the midpoint of the original
+  length bin (see Figure~\ref{fig:binFigs/binLW} for Bin~5), and ends at the
+  purple midpoint of the $\logtwo$ bin in which the converted value lies. The
+  blue dashed lines indicate that all body masses within the blue bin get
+  assigned to the same purple midpoint value. This ignores uncertainties in
+  body masses, and for Bins~3 and~6 assigns completely incorrect values
+  (greater than the body mass of any individual within the bin). But
+  such values get
+  used in the LBbiom or LBNbiom methods.}{figure3}
+
+\clearpage
+
+\thispagestyle{empty}
+
+\onefig{binFitting/fitMLEhists}{Histograms of estimated exponent $b$ for 10,000
+  simulated data sets, each of which contains 1,000 independent random numbers
+  drawn from a bounded power-law distribution with $b=-2$, $\xmin=1$ and
+  $\xmax=1,000$.
+Panels (a)-(f) use linear bins of constant bin width 1, 5 or 10 (binning type
+`Linear 1' etc.), and panels (g)-(h) use bin widths that double in size (binning
+type `2k'). Each binned data set is fitted using either the MLEmid method (a, c,
+e, g) or the MLEbin method (b, d, f, h). Vertical red lines indicate the known
+value of $b=-2$.}{figure4}
+
+\clearpage
+\thispagestyle{empty}
+
+\onefigshift{binFitting/fitMLEconfs}{Confidence intervals (horizontal lines) of
+  $b$ obtained for each combination of data-binning and MLE method for
+  subsamples of the 10,000 simulated data sets (with $\xmax=1,000$) used in
+  Figure~\fitMLEhists. Panels are the same as in Figure~\fitMLEhists. For each
+  numbered subsample on the y-axis, the 95\% confidence interval of $b$ obtained
+  using the respective method is plotted as a horizontal line, which is coloured
+  grey if the interval includes the true value of $b=-2$ (given by the vertical
+  red line) or blue if it does not. Simulations are sorted in ascending order of
+  their lower bound. The percentage for each method gives the observed coverage,
+  namely the percentage of all 10,000 simulated data sets for which the 95\%
+  confidence interval contains the true value of $b$; by definition, this should
+  ideally be 95\%. Horizontal axes are the same for all panels here and in
+  Figure~\fitMLEhists.}{figure5}
+
+\clearpage
+
+\onefig{nSeaFung/nSeaFungBins1}{Vertical bars show the body-mass bins that
+  result from converting the 1-cm length bins into body-mass bins using the
+  species-specific length-weight parameters. These are the first 45 species of
+  the IBTS data, ordered by the maximum value of the highest bin. Atlantic
+  Herring and European Sprat use 0.5-cm length bins (indicated by~$\times$). Any
+  vertical gaps between vertical bars indicate that there were no body masses of
+  that species in that range; i.e.~there were no individuals in the length
+  bin(s) that would result in the body-mass bin(s) that would fill the gap. For
+  example, there were no $\sim$30~g European Sprat (code 126425). Two example species are
+  shown in red. They have similar ranges of body masses, but Moustache Sculpin
+  (code 127205, \emph{Triglops murrayi}) is short and fat with lengths from
+  8-15~cm and length-weight relationship $w = 0.0088~l^{3.00}$, whereas
+  Snakeblenny (code 154675, \emph{Lumpenus lampretaeformis}) is long and skinny
+  with lengths from 13-37~cm and $w = 0.0244~l^{2.04}$, and consequently the
+  1-cm length bins translate to much narrower body-mass bins than for Moustache
+  Sculpin. Equivalent figures for the remaining 90 species are given in the
+  Supplementary Material.}{figure6}
+
+
+\clearpage
+\thispagestyle{empty}
+\begin{figure}[tp]
+\begin{center}
+\vspace{-14mm}
+\epsfbox{figure7.eps} % ../../fitting-size-spectra/codeBinStructure/nSeaFung/IBTS-ISDfigs/IBTS-ISD1999.eps}
+\end{center}
+\vspace{-9mm}
+\caption{Suggested plots of individual size distribution and MLEbins fit
+            (red solid curve)
+            with 95\% confidence intervals (red dashed curves, may be hard to
+            see) for IBTS data in 1999. The y-axis is linear in (a) and logarithmic
+            in (b).
+            For each bin, the horizontal green line shows
+            the range of body sizes,
+            with its value on the y-axis corresponding to the
+            total number of individuals (per hour of trawling) in bins whose
+            minima are $\geq$ the
+            bin's minimum.
+            The vertical span of each grey rectangle shows the
+            possible range of the number of individuals with body mass
+            $\geq$ the body mass of individuals in that bin (horizontal span
+            is the same as for the green lines).
+            The text in (a) gives the year,
+            the MLE for the size-spectrum exponent $b$, and the sample size $n$.
+            See Supplementary Material for
+            full details and results for all years.
+            Note that in (b) the logarithmic y-axis compresses most of the data
+            into the top-left corner.}
+\label{fig:ISD-1999.main}
+\end{figure}
+\clearpage
+
+\begin{figure}[tp]
+\begin{center}
+\epsfxsize=6in
+\epsfbox{figure8.eps}
+  \end{center}
+  \caption{Comparison of the annual estimates of
+  $b$ for the IBTS data using the original MLE method and the MLEbins method,
+  showing medians and 95\% confidence intervals (each year is slightly offset
+  to clearly show the confidence intervals).}
+\label{fig:nSeaFung/nSeaFungCompareTrends}
+\end{figure}
+
+\clearpage
+
+\end{document}
