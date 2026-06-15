@@ -15,15 +15,20 @@
 \usepackage{lineno}
 \usepackage{amsmath}       % for \text for x_min, for \dfrac
 \usepackage{natbib}
-% \usepackage{array}         % for fixed width tables
+\usepackage{array}         % for fixed width tables
+\usepackage{pdflscape}
 
 \bibliographystyle{natbibfull}
 
 \linenumbers
 
 \newcommand{\logten}{\log_{\mathrm{10}}}
+\renewcommand{\baselinestretch}{1.6}  % 1.6 seems small
 
-\renewcommand{\baselinestretch}{1.8}  % 1.6 seems small
+\newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+
 
 % http://ctan.math.ca/tex-archive/info/Free_Math_Font_Survey/en/survey.pdf
 \usepackage{mathptmx}    % Should have Times plus math fonts. AME used for Hake.
@@ -32,7 +37,7 @@
 \setlength{\parskip}{2.7ex plus 0.5ex minus 0.2ex}  
 % Maybe make smaller if final page is short
 
-\author{ANDREW M.~EDWARDS$^{1,2}$ and MARIE AUGER-M\'ETH\'E$^{3,4}$}
+\author{ANDREW M.~EDWARDS$^{1}$}
 \date{}
 
 \newcommand{\eb}{\begin{eqnarray}}
@@ -42,23 +47,16 @@
 
 \begin{document}
 
-\noindent {\Large \bf Some guidance on using mathematical notation in ecology}
+\noindent {\Large \bf sizeSpectraFit: A streamlined R package for fitting size spectra to ecological data}
 
 \vspace{7mm}
 
-\noindent {\large Andrew M.~Edwards$^{1,2,\star}$ and Marie Auger-M\'eth\'e$^{3,4}$}
+\noindent {\large Andrew M.~Edwards$^{1,\star}$}
 
 \medskip
 
 \noindent {\emph{$^1$Pacific Biological Station, Fisheries and Oceans Canada, 
     3190 Hammond Bay Road, Nanaimo, BC, V9T 6N7, Canada.
-    $^2$Department of Biology, University of Victoria, 
-    PO Box 1700 STN CSC, Victoria, British Columbia, V8W 2Y2, Canada.
-    $^3$Department of Statistics, University of British Columbia,
-    3182 Earth Sciences Building, 2207 Main Mall, Vancouver, British Columbia, V6T
-    1Z4, Canada.
-    $^4$Institute for the Oceans \& Fisheries, University of British Columbia,
-    AERL, 2202 Main Mall, Vancouver, British Columbia, V6T 1Z4, Canada.
   }}
 
 \noindent $^\star$Email: Andrew.Edwards@dfo-mpo.gc.ca
@@ -75,63 +73,96 @@ Andrew.Edwards@dfo-mpo.gc.ca
 
 \medskip
 
-\noindent Running title: Mathematical notation % 21 characters, max 45
+\noindent Running title: TODO % ** characters, max 45
  
 \medskip
 
-\noindent Word count (all pages): 5359   % \wordcount 
+\noindent Word count (all pages):   % \wordcount 
 % this is to automate the word count
 
 % Obtain with:
-% texcount -1 -sum -relaxed notation-rev.tex > notation-rev.wc
+% texcount -1 -sum -relaxed ssf.tex > ssf.wc
 
 \clearpage
 
 \section*{Summary}
 
-% From Methods in Ecology and Evolution rules. Maximum 350 words:
+% From Methods in Ecology and Evolution rules. Maximum 350 words: TODO check
+% rules for package style
 % Point 1: set the context and purpose for the work; 
 % Point 2: indicate the approach and methods used; 
 % Point 3: outline the main results; 
 % Point 4: identify the conclusions, the wider implications and the relevance to management or policy. 
 
-{\bf 1.}~Mathematical modelling is playing an increasing role
-in studies of ecological systems.
-This requires the communication of the details of a mathematical model,
-including the use of mathematical notation to represent
-ecological variables, parameters and processes. 
+{\bf 1.}~
 
 \medskip
 
-\noindent {\bf 2.}~In our experience, the clarity of mathematical notation
-varies between papers and can often be inconsistent with general conventions.
-Poor notation can impede communication and understanding of ideas, and make
-models appear more complicated than necessary.
+\noindent {\bf 2.}~
 
 \medskip
 
-\noindent {\bf 3.}~Here we present some guidelines, including: (i) define every
-term in an equation, (ii) use fonts appropriately (italicise mathematical symbols,
-use bold lower case for vectors and bold upper case for matrices), (iii) use
-subscripts appropriately (to index quantities, for example by year),
-(iv) use superscripts appropriately
-(to indicate a power, the transpose of a matrix or the steady-state value
-of a quantity), (v) avoid multi-letter variable names,
-and (vi) revisit notation early on in a project to see if it should be refined.
+\noindent {\bf 3.}~
 
 \medskip
 
-\noindent {\bf 4.}~Although we focus mainly on ecology, our guidelines should
-be of interest to researchers applying models in evolutionary biology and
-broader areas of biology.
+\noindent {\bf 4.}~
 
 
 % 182 words, so <350 limit for MEE.
 
-\noindent {\it Key words:} equations, ecological models, mathematics, variables,
-parameters, reproducibility.
+\noindent {\it Key words:} 
 
 \section*{Introduction}
+
+
+\thispagestyle{empty}
+
+\begin{landscape}
+  
+% Do captions this way if manuscript accepted.
+% Table \ref{tab:letters} caption.
+
+% Caption text....
+
+% \clearpage
+
+% \renewcommand{\arraystretch}{1.9}  % forces table double spaced
+\begin{table}
+  \caption{Example applications of the MLE (maximum likelihood estimation),
+    MLEbin (maximum likelihood estimate based on binning),
+    and MLEbins (MLEbin for overlapping bins, usually due to use of species-specific
+    length-weight relationships). `Exponent' corresponds to the calculated size-spectrum
+    exponent. TODO go through citation details, can first
+    use example from Open House talk. See dossier dossier26
+    citations-size-spectra citations-of-MEPS-in-detail.docx .
+    \label{tab:examples}}
+  \centering
+  \begin{tabular}{L{3cm} L{3cm} L{6cm} L{2cm} L{2cm} L{2cm}}
+\hline
+Data &  Location & Finding & Method & Reference \\ % Email for writing 
+\hline
+
+Fish lengths recorded by SCUBA divers & Four regions along the coast of Chile &
+ Broad latitudinal patterns in these fish assemblages are governed primarily
+ by shifts in community composition and size spectra & MLE & \cite{gart26} \\
+ % boolindi@gmail.com Simon Gartenstein
+Fish caught by hand nets and weighed; lengths of uncaptured fish were estimated
+ & Eight streams in New Zealand 
+ & Exponents differed between pre-migration and peak migration periods in
+   unfished streams, but not in fished streams
+ & MLEbin
+                                 
+\hline
+\end{tabular}
+\end{table}
+
+\end{landscape}
+
+% \end{flushleft}
+\end{document}
+
+\end{document}
 
 Six decades ago, \citet{lowr59} pleaded for
 the ``increased use of mathematical notation
@@ -864,52 +895,3 @@ This work uses no data.
 
 \clearpage
 
-\thispagestyle{empty}
-
-% Do captions this way if manuscript accepted.
-% Table \ref{tab:letters} caption.
-
-% Caption text....
-
-% \clearpage
-
-% \renewcommand{\arraystretch}{1.9}  % forces table double spaced
-\begin{table}
-  \caption{Common mathematical usage of particular letters and
-      symbols. \label{tab:letters}}
-  \centering
-  \begin{tabular}{ll}
-\hline
-Letter/symbol & Common usage\\
-\hline
-$e$ & usually avoided to prevent confusion with non-italicised e ($=$2.718...)\\
-  % base of natural logarithm, 
-$f, g$ & function, e.g.~$f(x) = x^3 + 7$\\
-$i, j, k$ & index, e.g.~the $i$th element of vector {\bf x} is $x_i$\\
-$n, N$ & sample size\\
-$o, O$ & usually avoided to prevent confusion with number 0\\
-$t$ & time\\
-$u, v, w$ & speeds\\    
-$x, y, z$ & variables, or co-ordinates in space\\
-\mbox{P}$(\cdot)$ & probability of occurrence of the event in parentheses\\
-$X, Y, Z$ & variables\\
-$\alpha, \beta, \gamma, \theta$ & parameters\\
-$\delta, \Delta$ & difference or change in a variable, $\Delta X$, or a 
-  parameter\\ 
-$\epsilon$ & a small value, or random noise term\\
-$\mu$ & mean\\
-$\pi$ & the value 3.141...\\
-$\prod$ & product of the proceeding values\\
-$\sigma$ & standard deviation\\
-$\sum$ & summation of the proceeding values\\
-$X^*$ & steady-state value of $X$\\
-$\dot{X}$ & derivative of $X$\\  % also $x'$ but that's really just physicists
-$f'(x)$ & derivative of $f(x)$ with respect to $x$\\
-$\partial f/\partial x$ & partial derivative of $f(x,y)$ with respect to $x$\\
-$\hat{\theta}$ & an estimate of $\theta$\\
-\hline
-\end{tabular}
-\end{table}
-
-% \end{flushleft}
-\end{document}
