@@ -127,32 +127,48 @@ Andrew.Edwards@dfo-mpo.gc.ca
 
 % \clearpage
 
-% \renewcommand{\arraystretch}{1.9}  % forces table double spaced
+\renewcommand{\baselinestretch}{1}
+% \renewcommand{\arraystretch}{1}  % forces table double spaced
 \begin{table}
   \caption{Example applications of the MLE (maximum likelihood estimation),
     MLEbin (maximum likelihood estimate based on binning),
     and MLEbins (MLEbin for overlapping bins, usually due to use of species-specific
-    length-weight relationships). `Exponent' corresponds to the calculated size-spectrum
-    exponent. TODO go through citation details, can first
+    length-weight relationships). NASS is the normalised aggregated size
+    spectrum. `Exponent' corresponds to the calculated size-spectrum
+    exponent $b$, with an increase (less negative, shallower slope) indicating abundances of larger individuals
+    increases relative to smaller- bodied. 
+    TODO go through citation details, can first
     use example from Open House talk. See dossier dossier26
     citations-size-spectra citations-of-MEPS-in-detail.docx .
     \label{tab:examples}}
   \centering
-  \begin{tabular}{L{3cm} L{3cm} L{6cm} L{2cm} L{2cm} L{2cm}}
+  \begin{tabular}{p{5cm} p{3cm} p{6cm} p{2cm} p{2cm} p{2cm}}
 \hline
 Data &  Location & Finding & Method & Reference \\ % Email for writing 
 \hline
-
 Fish lengths recorded by SCUBA divers & Four regions along the coast of Chile &
- Broad latitudinal patterns in these fish assemblages are governed primarily
- by shifts in community composition and size spectra & MLE & \cite{gart26} \\
- % boolindi@gmail.com Simon Gartenstein
+Broad latitudinal patterns in these fish assemblages are governed primarily
+by shifts in community composition and size spectra &
+MLE &
+\cite{gart26} \\
 Fish caught by hand nets and weighed; lengths of uncaptured fish were estimated
  & Eight streams in New Zealand 
  & Exponents differed between pre-migration and peak migration periods in
    unfished streams, but not in fished streams
- & MLEbin
-                                 
+ & MLEbin & \cite{cric26}\\
+ Lengths from bottom-trawl surveys before and after implementation of a no-take reserve &
+ Northwestern Mediterranean Sea &
+ Key Crustacean gropu showed expected response to no-take reserve
+ & MLEbins, NASS & \cite{quev26}\\
+ Database of individual size measurements of fish &
+ 272 stream assemblages acrossthe United States of America &
+ Path analyses indicate species traits have strong direct effects on the ISD, while flow
+and land use effects are largely indirect through influencing traits &
+% Exponents increase when environments favor higher trophic levels, warmer thermal
+% tolerances, and periodic life histories.
+ MLE & \cite{wood25} \\
+
+ 
 \hline
 \end{tabular}
 \end{table}
@@ -162,7 +178,30 @@ Fish caught by hand nets and weighed; lengths of uncaptured fish were estimated
 % \end{flushleft}
 \end{document}
 
-\end{document}
+
+boolindi@gmail.com Simon Gartenstein
+
+crich26:
+Fishing-induced regulation of diadromous fish subsidies in stream communities
+B. R. J. Crichton
+M. J. H. Hickford
+A. R. McIntosh
+D. R. Schiel1
+Freshwater Biology, 2026; 71:e70166
+https://doi.org/10.1111/fwb.70166
+bcrichtonnz@gmail.com
+
+wood25:
+Integrating theory and empirical patterns: fish body
+size distributions, life history traits, and environmental
+flows in streams
+T. Woods and D. J. McGarvey and M. J. Cashman and M. R. Meador and
+D. M. Carlisle and K. Eng and D. A. Kopp and K. O. Maloney
+Science Advances 11, eadu4026 (2025).
+tewoods@​usgs.​gov
+
+
+
 
 Six decades ago, \citet{lowr59} pleaded for
 the ``increased use of mathematical notation
